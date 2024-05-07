@@ -1,3 +1,5 @@
+package com.basesdedatos.repository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -84,5 +86,17 @@ public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clie
                 statement.executeUpdate();
             }
         }
+    }
+
+    @Override
+    public Integer CountClientes() throws SQLException {
+        String sql = "SELECT COUNT(*) AS total FROM clientes";
+        try (Statement statement = getConnection().createStatement()) {
+            ResultSet resultSet = statement.executeQuery(sql);
+            if (resultSet.next()) {
+                return resultSet.getInt("total");
+            }
+        }
+        return 0; // Return 0 if no rows found
     }
 }
