@@ -10,7 +10,7 @@ import java.util.List;
 import com.basesdedatos.config.DatabaseConnection;
 import com.basesdedatos.model.Clientes;
 
-public class ClienteRepository implements Repository<Clientes> {
+public class ClienteRepository implements Repository<Clientes>,Repository2<Clientes> {
 
     private Connection geConnection()throws SQLException{
         return DatabaseConnection.getInstance();
@@ -40,6 +40,12 @@ public class ClienteRepository implements Repository<Clientes> {
     public void save(Clientes entidad) throws SQLException {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'save'");
+    }
+
+    @Override
+    public Integer CountClientes(Integer id) throws SQLException {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'CountClientes'");
     }
 
     

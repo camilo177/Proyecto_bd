@@ -17,7 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 import com.basesdedatos.model.Actor;
-import com.basesdedatos.repository.ActorRepository;
+import com.basesdedatos.repository.ClienteRepository;
 import com.basesdedatos.repository.Repository;
 import com.mysql.cj.xdevapi.JsonArray;
 
@@ -42,10 +42,11 @@ public class SwingApp extends JFrame{
         buttonPanel.add(addButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
+        buttonPanel.add(deleteButton);
 
         add(buttonPanel,BorderLayout.SOUTH);
 
-        ActorRepository = new ActorRepository();
+        ActorRepository = new ClienteRepository();
 
         listActors();
 

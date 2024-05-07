@@ -9,5 +9,4 @@ public interface Repository<T> {
     T getById(Integer id) throws SQLException;
     void save(T entidad) throws SQLException;
     void delete(Integer id) throws SQLException;
-
 }
