@@ -1,5 +1,3 @@
-package com.basesdedatos.repository;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -7,47 +5,84 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+
 import com.basesdedatos.config.DatabaseConnection;
 import com.basesdedatos.model.Clientes;
 
-public class ClienteRepository implements Repository<Clientes>,Repository2<Clientes> {
+public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clientes> {
 
-    private Connection geConnection()throws SQLException{
+    private Connection getConnection() throws SQLException {
         return DatabaseConnection.getInstance();
     }
 
     @Override
     public List<Clientes> findAll() throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findAll'");
+        List<Clientes> clientes = new ArrayList<>();
+        String sql = "SELECT * FROM clientes";
+        try (Statement myStat = getConnection().createStatement()) {
+            ResultSet myResultSet = myStat.executeQuery(sql);
+            while (myResultSet.next()) {
+                Clientes cliente = createCliente(myResultSet);
+                clientes.add(cliente);
+            }
+        }
+        return clientes;
+    }
+
+    private Clientes createCliente(ResultSet myResult) throws SQLException {
+        Clientes cliente = new Clientes();
+        cliente.setClientes_ID(myResult.getInt("clientes_ID"));
+        cliente.setNombre(myResult.getString("nombre"));
+        cliente.setApellido(myResult.getString("apellido"));
+        cliente.setDireccion(myResult.getString("direccion"));
+        cliente.setContacto(myResult.getString("contacto"));
+        return cliente;
     }
 
     @Override
     public Clientes getById(Integer id) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getById'");
+        String sql = "SELECT * FROM clientes WHERE clientes_ID = ?";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setInt(1, id);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return createCliente(resultSet);
+            }
+        }
+        return null;
     }
-
-
 
     @Override
     public void delete(Integer id) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        String sql = "DELETE FROM clientes WHERE clientes_ID = ?";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setInt(1, id);
+            statement.executeUpdate();
+        }
     }
 
     @Override
-    public void save(Clientes entidad) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
+    public void save(Clientes cliente) throws SQLException {
+        if (cliente.getClientes_ID() == null) {
+            String sql = "INSERT INTO clientes (nombre, apellido, direccion, contacto) VALUES (?, ?, ?, ?)";
+            try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+                statement.setString(1, cliente.getNombre());
+                statement.setString(2, cliente.getApellido());
+                statement.setString(3, cliente.getDireccion());
+                statement.setString(4, cliente.getContacto());
+                statement.executeUpdate();
+            }
+        } else {
+            // Update an existing record
+            String sql = "UPDATE clientes SET nombre = ?, apellido = ?, direccion = ?, contacto = ? WHERE clientes_ID = ?";
+            try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+                statement.setString(1, cliente.getNombre());
+                statement.setString(2, cliente.getApellido());
+                statement.setString(3, cliente.getDireccion());
+                statement.setString(4, cliente.getContacto());
+                statement.setInt(5, cliente.getClientes_ID());
+                statement.executeUpdate();
+            }
+        }
     }
-
-    @Override
-    public Integer CountClientes(Integer id) throws SQLException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'CountClientes'");
-    }
-
-    
-    
 }
