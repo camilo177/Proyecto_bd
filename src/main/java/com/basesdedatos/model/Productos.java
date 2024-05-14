@@ -2,7 +2,7 @@ package com.basesdedatos.model;
 
 public class Productos {
     
-    private int producto_ID;
+    private Integer producto_ID;
     private String nombreProducto;
     private String descripcion;
     private double precio;
@@ -19,11 +19,11 @@ public class Productos {
         this.stock_Disponible = stock_Disponible;
     }
 
-    public int getProducto_ID() {
+    public Integer getProducto_ID() {
         return producto_ID;
-    }
+    }   
 
-    public void setProducto_ID(int producto_ID) {
+    public void setProducto_ID(Integer producto_ID) {
         this.producto_ID = producto_ID;
     }
 

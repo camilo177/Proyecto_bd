@@ -52,16 +52,32 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     }
 
     @Override
-    public void save(Pedidos entidad) throws SQLException {
-        // TODO: Implement save method
-        throw new UnsupportedOperationException("Unimplemented method 'save'");
-    }
+    public void save(Pedidos pedido) throws SQLException {
+        if (pedido.getPedidos_ID()==null) {
+           String sql = "INSERT INTO Pedidos (Producto_ID, Cliente_ID, Fecha_Pedido, Estado, Precio_Total) VALUES (?, ?, ?, ?, ?)";
+           try (Connection connection = getConnection();
+                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+               preparedStatement.setTimestamp(1, java.sql.Timestamp.valueOf(pedido.getFechaPedido()));
+               preparedStatement.setBoolean(2, pedido.isEstado());
+               preparedStatement.setDouble(3, pedido.getPrecio_Total());
+               preparedStatement.executeUpdate();
+           }
+        }
+    } ///PENDIENTE
 
     @Override
     public void delete(Integer id) throws SQLException {
-        // TODO: Implement delete method
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
+        String sql = "DELETE FROM Pedidos WHERE Pedidos_ID = ?";
+        try(Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+            preparedStatement.setInt(1, id);
+            preparedStatement.executeUpdate();
+        }
     }
+
+    ////////////////////////////////////////////////////////
+    // Methods from RepositoryPe //
+    ////////////////////////////////////////////////////////
 
     @Override
     public Integer CountPedidos(Clientes cliente) throws SQLException { 
@@ -79,19 +95,15 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     }
 
     @Override
-    public List<String> listarDetallesClientes() throws SQLException {
-        List<String> detallesClientes = new ArrayList<>();
+    public List<Clientes> listarDetallesClientes() throws SQLException {
+        List<Clientes> detallesClientes = new ArrayList<>();
         String query = "SELECT * FROM Clientes";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
             while (resultSet.next()) {
-                String detalles = resultSet.getInt("Clientes_ID") + " | " +
-                                  resultSet.getString("Nombre") + " | " +
-                                  resultSet.getString("Apellido") + " | " +
-                                  resultSet.getString("Direccion") + " | " +
-                                  resultSet.getString("Contacto");
-                detallesClientes.add(detalles);
+                Clientes cliente = mapResultSetToClientes(resultSet);
+                detallesClientes.add(cliente);
             }
         }
         return detallesClientes;
@@ -179,6 +191,17 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
             }
         }
         return productosNoPedidos;
+    } ///PENDIENTE
+
+    // Helper method to map ResultSet to Clientes object
+    private Clientes mapResultSetToClientes(ResultSet resultSet) throws SQLException {
+        Clientes cliente = new Clientes();
+        cliente.setClientes_ID(resultSet.getInt("Clientes_ID"));
+        cliente.setNombre(resultSet.getString("Nombre"));
+        cliente.setApellido(resultSet.getString("Apellido"));
+        cliente.setDireccion(resultSet.getString("Direccion"));
+        cliente.setContacto(resultSet.getString("Contacto"));
+        return cliente;
     }
 
     // Helper method to map ResultSet to Pedidos object
@@ -193,17 +216,37 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
         return pedido;
     }
 
-    // Helper method to retrieve Productos by ID
-    private Productos getProductosById(int id) throws SQLException {
-        // Implement this method to retrieve Productos by ID from the database
-        // Return a Productos object based on the provided ID
+    private Productos getProductosById(Integer id) throws SQLException {
+        String query = "SELECT * FROM Productos WHERE Productos_ID = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return new Productos(
+                            resultSet.getInt("Productos_ID"),
+                            resultSet.getString("Nombre_Producto"),
+                            resultSet.getString("Descripcion"),
+                            resultSet.getDouble("Precio"),
+                            resultSet.getInt("Stock_Disponibles") == 1
+                    );
+                }
+            }
+        }
         return null;
     }
 
-    // Helper method to retrieve Clientes by ID
-    private Clientes getClientesById(int id) throws SQLException {
-        // Implement this method to retrieve Clientes by ID from the database
-        // Return a Clientes object based on the provided ID
+    private Clientes getClientesById(Integer id) throws SQLException {
+        String query = "SELECT * FROM Clientes WHERE Clientes_ID = ?";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query)) {
+            preparedStatement.setInt(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return mapResultSetToClientes(resultSet);
+                }
+            }
+        }
         return null;
     }
 }

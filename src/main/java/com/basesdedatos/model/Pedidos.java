@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 
 public class Pedidos {
     
-    private int pedidos_ID;
+    private Integer Pedidos_ID;
     private Productos producto_ID;
     private Clientes Cliente_ID;
     private LocalDateTime fechaPedido;
@@ -16,7 +16,7 @@ public class Pedidos {
     }
 
     public Pedidos(int pedidos_ID, Productos producto_ID, Clientes Cliente_ID, LocalDateTime fechaPedido, boolean estado, String metodo_Pago, double precio_Total) {
-        this.pedidos_ID = pedidos_ID;
+        this.Pedidos_ID = pedidos_ID;
         this.producto_ID = producto_ID;
         this.Cliente_ID = Cliente_ID;
         this.fechaPedido = fechaPedido;
@@ -25,13 +25,7 @@ public class Pedidos {
         this.precio_Total = precio_Total;
     }
 
-    public int getPedidos_ID() {
-        return pedidos_ID;
-    }
-
-    public void setPedidos_ID(int pedidos_ID) {
-        this.pedidos_ID = pedidos_ID;
-    }
+    
 
     public Productos getProducto_ID() {
         return producto_ID;
@@ -79,6 +73,14 @@ public class Pedidos {
 
     public void setPrecio_Total(double precio_Total) {
         this.precio_Total = precio_Total;
+    }
+
+    public Integer getPedidos_ID() {
+        return Pedidos_ID;
+    }
+
+    public void setPedidos_ID(Integer pedidos_ID) {
+        Pedidos_ID = pedidos_ID;
     }        
     
 }
