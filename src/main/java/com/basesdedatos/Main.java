@@ -8,7 +8,7 @@ import com.basesdedatos.model.Clientes;
 import com.basesdedatos.model.Pedidos;
 import com.basesdedatos.model.Productos;
 import com.basesdedatos.model.Entregas;
-import com.basesdedatos.repository.ActorRepository;
+import com.basesdedatos.repository.ClienteRepository;
 import com.basesdedatos.repository.Repository;
 import com.basesdedatos.view.SwingApp;
 

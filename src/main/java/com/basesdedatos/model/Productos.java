@@ -11,6 +11,14 @@ public class Productos {
     public Productos() {
     }
 
+    public Productos(int producto_ID, String nombreProducto, String descripcion, double precio, boolean stock_Disponible) {
+        this.producto_ID = producto_ID;
+        this.nombreProducto = nombreProducto;
+        this.descripcion = descripcion;
+        this.precio = precio;
+        this.stock_Disponible = stock_Disponible;
+    }
+
     public int getProducto_ID() {
         return producto_ID;
     }
