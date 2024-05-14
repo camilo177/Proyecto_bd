@@ -63,7 +63,7 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
                preparedStatement.executeUpdate();
            }
         }
-    } ///PENDIENTE
+    } 
 
     @Override
     public void delete(Integer id) throws SQLException {
