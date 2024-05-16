@@ -51,11 +51,11 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     @Override
     public void save(Productos producto) throws SQLException {
-        if (producto.getProducto_ID() == 0) {
+        if (producto.getProductos_ID() == 0) {
             // Insert a new record
             String sql = "INSERT INTO productos (nombreProducto, descripcion, precio, stock_Disponible) VALUES (?, ?, ?, ?)";
             try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-                statement.setString(1, producto.getNombreProducto());
+                statement.setString(1, producto.getNombre_Producto());
                 statement.setString(2, producto.getDescripcion());
                 statement.setDouble(3, producto.getPrecio());
                 statement.setBoolean(4, producto.isStock_Disponible());
@@ -65,11 +65,11 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
             // Update an existing record
             String sql = "UPDATE productos SET nombreProducto = ?, descripcion = ?, precio = ?, stock_Disponible = ? WHERE producto_ID = ?";
             try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-                statement.setString(1, producto.getNombreProducto());
+                statement.setString(1, producto.getNombre_Producto());
                 statement.setString(2, producto.getDescripcion());
                 statement.setDouble(3, producto.getPrecio());
                 statement.setBoolean(4, producto.isStock_Disponible());
-                statement.setInt(5, producto.getProducto_ID());
+                statement.setInt(5, producto.getProductos_ID());
                 statement.executeUpdate();
             }
         }
@@ -86,8 +86,8 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     private Productos createProducto(ResultSet resultSet) throws SQLException {
         Productos producto = new Productos();
-        producto.setProducto_ID(resultSet.getInt("producto_ID"));
-        producto.setNombreProducto(resultSet.getString("nombreProducto"));
+        producto.setProductos_ID(resultSet.getInt("producto_ID"));
+        producto.setNombre_Producto(resultSet.getString("nombreProducto"));
         producto.setDescripcion(resultSet.getString("descripcion"));
         producto.setPrecio(resultSet.getDouble("precio"));
         producto.setStock_Disponible(resultSet.getBoolean("stock_Disponible"));

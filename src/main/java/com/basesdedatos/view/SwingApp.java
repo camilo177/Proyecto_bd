@@ -91,8 +91,6 @@ public class SwingApp extends JFrame {
             }
         });
 
-        listClientes();
-        listPedidos();
         listProductos();
     }
 
@@ -172,7 +170,7 @@ public class SwingApp extends JFrame {
         int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Producto", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
             Productos producto = new Productos();
-            producto.setNombreProducto(nombreProductoField.getText());
+            producto.setNombre_Producto(nombreProductoField.getText());
             producto.setDescripcion(descripcionField.getText());
             producto.setPrecio(Double.parseDouble(precioField.getText()));
             producto.setStock_Disponible(Boolean.parseBoolean(stockField.getText()));
@@ -254,8 +252,8 @@ public class SwingApp extends JFrame {
 
             for (Productos producto : productos) {
                 Object[] dataRow = {
-                    producto.getProducto_ID(),
-                    producto.getNombreProducto(),
+                    producto.getProductos_ID(),
+                    producto.getNombre_Producto(),
                     producto.getDescripcion(),
                     producto.getPrecio(),
                     producto.isStock_Disponible()

@@ -2,61 +2,56 @@ package com.basesdedatos.model;
 
 public class Productos {
     
-    private Integer producto_ID;
-    private String nombreProducto;
-    private String descripcion;
-    private double precio;
-    private boolean stock_Disponible;
+    private Integer productos_ID;
+    private String Nombre_Producto;
+    private String Descripcion;
+    private double Precio;
+    private boolean Stock_Disponible;
+
+    
+    
+    public Productos(Integer productos_ID, String nombre_Producto, String descripcion, double precio,
+            boolean stock_Disponible) {
+        this.productos_ID = productos_ID;
+        Nombre_Producto = nombre_Producto;
+        Descripcion = descripcion;
+        Precio = precio;
+        Stock_Disponible = stock_Disponible;
+    }
 
     public Productos() {
     }
 
-    public Productos(int producto_ID, String nombreProducto, String descripcion, double precio, boolean stock_Disponible) {
-        this.producto_ID = producto_ID;
-        this.nombreProducto = nombreProducto;
-        this.descripcion = descripcion;
-        this.precio = precio;
-        this.stock_Disponible = stock_Disponible;
+    public Integer getProductos_ID() {
+        return productos_ID;
     }
-
-    public Integer getProducto_ID() {
-        return producto_ID;
-    }   
-
-    public void setProducto_ID(Integer producto_ID) {
-        this.producto_ID = producto_ID;
+    public void setProductos_ID(Integer productos_ID) {
+        this.productos_ID = productos_ID;
     }
-
-    public String getNombreProducto() {
-        return nombreProducto;
+    public String getNombre_Producto() {
+        return Nombre_Producto;
     }
-
-    public void setNombreProducto(String nombreProducto) {
-        this.nombreProducto = nombreProducto;
+    public void setNombre_Producto(String nombre_Producto) {
+        Nombre_Producto = nombre_Producto;
     }
-
     public String getDescripcion() {
-        return descripcion;
+        return Descripcion;
     }
-
     public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+        Descripcion = descripcion;
     }
-
     public double getPrecio() {
-        return precio;
+        return Precio;
     }
-
     public void setPrecio(double precio) {
-        this.precio = precio;
+        Precio = precio;
     }
-
     public boolean isStock_Disponible() {
-        return stock_Disponible;
+        return Stock_Disponible;
+    }
+    public void setStock_Disponible(boolean stock_Disponible) {
+        Stock_Disponible = stock_Disponible;
     }
 
-    public void setStock_Disponible(boolean stock_Disponible) {
-        this.stock_Disponible = stock_Disponible;
-    }
     
 }
