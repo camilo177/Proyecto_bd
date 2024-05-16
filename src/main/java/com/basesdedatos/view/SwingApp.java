@@ -5,178 +5,267 @@ import javax.swing.JOptionPane;
 
 import java.awt.BorderLayout;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.jar.JarEntry;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import com.basesdedatos.model.Actor;
+import com.basesdedatos.model.Clientes;
+import com.basesdedatos.model.Pedidos;
+import com.basesdedatos.model.Productos;
 import com.basesdedatos.repository.ClienteRepository;
+import com.basesdedatos.repository.PedidoRepository;
+import com.basesdedatos.repository.ProductoRepository;
 import com.basesdedatos.repository.Repository;
-import com.mysql.cj.xdevapi.JsonArray;
 
-public class SwingApp extends JFrame{
-    private final Repository<Actor> ActorRepository;
-    private final JTable ActorTable;
+public class SwingApp extends JFrame {
+    private final Repository<Clientes> clienteRepository;
+    private final Repository<Pedidos> pedidoRepository;
+    private final Repository<Productos> productoRepository;
 
-    public SwingApp(){
-        setTitle("Gestion Sakila");
+    private final JTable clientesTable;
+    private final JTable pedidosTable;
+    private final JTable productosTable;
+
+    public SwingApp() {
+        setTitle("Gestión de Clientes, Pedidos y Productos");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600,300);
+        setSize(800, 600);
 
-        ActorTable = new JTable();
-        JScrollPane scrollPane = new JScrollPane(ActorTable);
-        add(scrollPane,BorderLayout.CENTER);
+        clienteRepository = new ClienteRepository();
+        pedidoRepository = new PedidoRepository();
+        productoRepository = new ProductoRepository();
 
-        JButton addButton = new JButton("Agregar");
-        JButton updateButton = new JButton("Actualizar");
-        JButton deleteButton = new JButton("Borrar");
+        clientesTable = new JTable();
+        JScrollPane clientesScrollPane = new JScrollPane(clientesTable);
+
+        pedidosTable = new JTable();
+        JScrollPane pedidosScrollPane = new JScrollPane(pedidosTable);
+
+        productosTable = new JTable();
+        JScrollPane productosScrollPane = new JScrollPane(productosTable);
+
+        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane.addTab("Clientes", clientesScrollPane);
+        tabbedPane.addTab("Pedidos", pedidosScrollPane);
+        tabbedPane.addTab("Productos", productosScrollPane);
+        add(tabbedPane, BorderLayout.CENTER);
+
+        JButton addClienteButton = new JButton("Agregar Cliente");
+        JButton addPedidoButton = new JButton("Agregar Pedido");
+        JButton addProductoButton = new JButton("Agregar Producto");
 
         JPanel buttonPanel = new JPanel();
-        buttonPanel.add(addButton);
-        buttonPanel.add(updateButton);
-        buttonPanel.add(deleteButton);
-        buttonPanel.add(deleteButton);
+        buttonPanel.add(addClienteButton);
+        buttonPanel.add(addPedidoButton);
+        buttonPanel.add(addProductoButton);
+        add(buttonPanel, BorderLayout.SOUTH);
 
-        add(buttonPanel,BorderLayout.SOUTH);
-
-        ActorRepository = new ClienteRepository();
-
-        listActors();
-
-        addButton.addActionListener(e-> {
+        addClienteButton.addActionListener(e -> {
             try {
-               addActor();
+                addCliente();
             } catch (Exception ex) {
-                ex.printStackTrace(); 
+                ex.printStackTrace();
             }
         });
 
-        updateButton.addActionListener(e-> {
+        addPedidoButton.addActionListener(e -> {
             try {
-                actualizarActor();
+                addPedido();
             } catch (Exception ex) {
-                ex.printStackTrace(); 
+                ex.printStackTrace();
             }
         });
 
-        deleteButton.addActionListener(e-> {
+        addProductoButton.addActionListener(e -> {
             try {
-                eliminarEmpleado();
+                addProducto();
             } catch (Exception ex) {
-                ex.printStackTrace(); 
+                ex.printStackTrace();
             }
         });
 
+        listClientes();
+        listPedidos();
+        listProductos();
     }
 
-    private void addActor() throws SQLException {
-        JTextField first_name = new JTextField();
-        JTextField last_name = new JTextField();
+    private void addCliente() throws SQLException {
+        JTextField nombreField = new JTextField();
+        JTextField apellidoField = new JTextField();
+        JTextField direccionField = new JTextField();
+        JTextField contactoField = new JTextField();
 
-        Object[] fields= {
-            "name", first_name,
-            "lastname", last_name,
+        Object[] fields = {
+            "Nombre:", nombreField,
+            "Apellido:", apellidoField,
+            "Dirección:", direccionField,
+            "Contacto:", contactoField
         };
 
-        int result = JOptionPane.showConfirmDialog(this, fields, "add actor", JOptionPane.OK_CANCEL_OPTION);
+        int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Cliente", JOptionPane.OK_CANCEL_OPTION);
         if (result == JOptionPane.OK_OPTION) {
+            Clientes cliente = new Clientes();
+            cliente.setNombre(nombreField.getText());
+            cliente.setApellido(apellidoField.getText());
+            cliente.setDireccion(direccionField.getText());
+            cliente.setContacto(contactoField.getText());
 
-            Actor actor = new Actor();
-            actor.setFirst_name(first_name.getText());
-            actor.setLast_name(last_name.getText());
+            clienteRepository.save(cliente);
 
-            ActorRepository.save(actor);
+            listClientes();
 
-            listActors();
-
-            JOptionPane.showMessageDialog(this, "Empleado agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
-        }
-
-    }
-
-    
-    private void actualizarActor() {
-        String actorIDSTR = JOptionPane.showInputDialog(this, "Ingrese el ID del actor a actualizar:", "Actualizar Actor", JOptionPane.QUESTION_MESSAGE);
-        if (actorIDSTR != null) {
-            try {
-                int actorID = Integer.parseInt(actorIDSTR);
-
-                Actor actor = ActorRepository.getById(actorID);
-
-                if (actor != null) {
-                    JTextField nombreField = new JTextField(actor.getFirst_name());
-                    JTextField apellidoField = new JTextField(actor.getLast_name());
-                
-                    Object[] fields = {
-                            "Name:", nombreField,
-                            "Last_name:", apellidoField,
-                    };
-
-                    int confirmResult = JOptionPane.showConfirmDialog(this, fields, "Actualizar Actor", JOptionPane.OK_CANCEL_OPTION);
-                    if (confirmResult == JOptionPane.OK_OPTION) {
-                        actor.setFirst_name(nombreField.getText());
-                        actor.setLast_name(apellidoField.getText());
-                        ActorRepository.save(actor);
-
-                        listActors();
-                    }
-                } else {
-                    JOptionPane.showMessageDialog(this, "No se encontró ningún empleado con el ID especificado", "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Ingrese un valor numérico válido para el ID", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException e) {
-                JOptionPane.showMessageDialog(this, "Error al obtener los datos del empleado de la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
-            }
+            JOptionPane.showMessageDialog(this, "Cliente agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
-    private void eliminarEmpleado() {
-        String empleadoIdStr = JOptionPane.showInputDialog(this, "Ingrese el ID a eliminar:", "Eliminar Actor", JOptionPane.QUESTION_MESSAGE);
-        if (empleadoIdStr != null) {
-            try {
-                int empleadoId = Integer.parseInt(empleadoIdStr);
+    private void addPedido() throws SQLException {
+        JTextField productoIdField = new JTextField();
+        JTextField clienteIdField = new JTextField();
+        JTextField fechaPedidoField = new JTextField();
+        JTextField precioTotalField = new JTextField();
 
-                int confirmResult = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar el actor?", "Confirmar Eliminación", JOptionPane.YES_NO_OPTION);
-                if (confirmResult == JOptionPane.YES_OPTION) {
-                    ActorRepository.delete(empleadoId);
+        Object[] fields = {
+            "ID del Producto:", productoIdField,
+            "ID del Cliente:", clienteIdField,
+            "Fecha del Pedido (YYYY-MM-DD HH:MM:SS):", fechaPedidoField,
+            "Precio Total:", precioTotalField
+        };
 
-                    listActors();
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Ingrese un valor para el ID del actor", "Error", JOptionPane.ERROR_MESSAGE);
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
+        int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Pedido", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            Pedidos pedido = new Pedidos();
+            pedido.setProducto_ID(productoRepository.getById(Integer.parseInt(productoIdField.getText())));
+            pedido.setCliente_ID(clienteRepository.getById(Integer.parseInt(clienteIdField.getText())));
+
+            // Convertir la cadena de fecha y hora en un objeto LocalDateTime
+            pedido.setFechaPedido(LocalDateTime.parse(fechaPedidoField.getText()));
+            pedido.setPrecio_Total(Double.parseDouble(precioTotalField.getText()));
+
+            pedidoRepository.save(pedido);
+
+            listPedidos();
+
+            JOptionPane.showMessageDialog(this, "Pedido agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-    private void listActors() {
+
+    private void addProducto() throws SQLException {
+        JTextField nombreProductoField = new JTextField();
+        JTextField descripcionField = new JTextField();
+        JTextField precioField = new JTextField();
+        JTextField stockField = new JTextField();
+
+        Object[] fields = {
+            "Nombre del Producto:", nombreProductoField,
+            "Descripción:", descripcionField,
+            "Precio:", precioField,
+            "Stock:", stockField
+        };
+
+        int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Producto", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            Productos producto = new Productos();
+            producto.setNombreProducto(nombreProductoField.getText());
+            producto.setDescripcion(descripcionField.getText());
+            producto.setPrecio(Double.parseDouble(precioField.getText()));
+            producto.setStock_Disponible(Boolean.parseBoolean(stockField.getText()));
+
+            productoRepository.save(producto);
+
+            listProductos();
+
+            JOptionPane.showMessageDialog(this, "Producto agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        }
+    }
+
+    private void listClientes() {
         try {
-            List<Actor> actors = ActorRepository.findAll();
+            List<Clientes> clientes = clienteRepository.findAll();
 
             DefaultTableModel tableModel = new DefaultTableModel();
             tableModel.addColumn("ID");
-            tableModel.addColumn("Primer Nombre");
+            tableModel.addColumn("Nombre");
+            tableModel.addColumn("Apellido");
+            tableModel.addColumn("Dirección");
+            tableModel.addColumn("Contacto");
 
-            for (Actor actor : actors) {
+            for (Clientes cliente : clientes) {
                 Object[] dataRow = {
-                    actor.getActor_id(),
-                    actor.getFirst_name()
+                    cliente.getClientes_ID(),
+                    cliente.getNombre(),
+                    cliente.getApellido(),
+                    cliente.getDireccion(),
+                    cliente.getContacto()
                 };
                 tableModel.addRow(dataRow);
             }
-            ActorTable.setModel(tableModel);
+            clientesTable.setModel(tableModel);
 
         } catch (SQLException e) {
-            JOptionPane.showMessageDialog(this,"Error getAll","Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos de los clientes", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listPedidos() {
+        try {
+            List<Pedidos> pedidos = pedidoRepository.findAll();
+
+            DefaultTableModel tableModel = new DefaultTableModel();
+            tableModel.addColumn("ID");
+            tableModel.addColumn("ID del Producto");
+            tableModel.addColumn("ID del Cliente");
+            tableModel.addColumn("Fecha del Pedido");
+            tableModel.addColumn("Precio Total");
+
+            for (Pedidos pedido : pedidos) {
+                Object[] dataRow = {
+                    pedido.getPedidos_ID(),
+                    pedido.getProducto_ID(),
+                    pedido.getCliente_ID(),
+                    pedido.getFechaPedido(),
+                    pedido.getPrecio_Total()
+                };
+                tableModel.addRow(dataRow);
+            }
+            pedidosTable.setModel(tableModel);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos de los pedidos", "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listProductos() {
+        try {
+            List<Productos> productos = productoRepository.findAll();
+
+            DefaultTableModel tableModel = new DefaultTableModel();
+            tableModel.addColumn("ID");
+            tableModel.addColumn("Nombre del Producto");
+            tableModel.addColumn("Descripción");
+            tableModel.addColumn("Precio");
+            tableModel.addColumn("Stock Disponible");
+
+            for (Productos producto : productos) {
+                Object[] dataRow = {
+                    producto.getProducto_ID(),
+                    producto.getNombreProducto(),
+                    producto.getDescripcion(),
+                    producto.getPrecio(),
+                    producto.isStock_Disponible()
+                };
+                tableModel.addRow(dataRow);
+            }
+            productosTable.setModel(tableModel);
+
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al obtener los datos de los productos", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
-
