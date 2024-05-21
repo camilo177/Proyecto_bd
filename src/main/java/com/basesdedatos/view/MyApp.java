@@ -13,6 +13,8 @@ import com.basesdedatos.repository.ProductoRepository;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -40,6 +42,7 @@ public class MyApp extends JFrame {
         JButton btnGetPedidos = new JButton("Get All Pedidos");
         JButton btnGetProductos = new JButton("Get All Productos");
         JButton btnAddPedido = new JButton("Add Pedido");
+        JButton btnAddProducto = new JButton("Add Producto");
         JButton btnUpdatePedido = new JButton("Update Pedido");
         JButton btnDeletePedido = new JButton("Delete Pedido");
 
@@ -48,6 +51,7 @@ public class MyApp extends JFrame {
         panel.add(btnGetPedidos);
         panel.add(btnGetProductos);
         panel.add(btnAddPedido);
+        panel.add(btnAddProducto);
         panel.add(btnUpdatePedido);
         panel.add(btnDeletePedido);
 
@@ -59,6 +63,7 @@ public class MyApp extends JFrame {
         btnGetPedidos.addActionListener(e -> fetchData(() -> pedidoRepository.findAll()));
         btnGetProductos.addActionListener(e -> fetchData(() -> productoRepository.findAll()));
         btnAddPedido.addActionListener(e -> addPedido());
+        btnAddProducto.addActionListener(e -> addProducto());
         btnUpdatePedido.addActionListener(e -> updatePedido());
         btnDeletePedido.addActionListener(e -> deletePedido());
 
@@ -144,9 +149,77 @@ public class MyApp extends JFrame {
     }
 
     private void addPedido() {
-        // Implement addPedido functionality
-        // You can create a dialog for user input and then call the repository method to add the pedido
+    JTextField productoIdField = new JTextField();
+    JTextField clienteIdField = new JTextField();
+    JTextField fechaPedidoField = new JTextField();
+    JTextField precioTotalField = new JTextField();
+
+    Object[] fields = {
+        "ID del Producto:", productoIdField,
+        "ID del Cliente:", clienteIdField,
+        "Fecha del Pedido (YYYY-MM-DD HH:MM:SS):", fechaPedidoField,
+        "Precio Total:", precioTotalField
+    };
+
+    int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Pedido", JOptionPane.OK_CANCEL_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            Pedidos pedido = new Pedidos();
+            pedido.setProducto_ID(productoRepository.getById(Integer.parseInt(productoIdField.getText())));
+            pedido.setCliente_ID(clienteRepository.getById(Integer.parseInt(clienteIdField.getText())));
+
+            // Convertir la cadena de fecha y hora en un objeto LocalDateTime
+            pedido.setFechaPedido(LocalDateTime.parse(fechaPedidoField.getText()));
+            pedido.setPrecio_Total(Double.parseDouble(precioTotalField.getText()));
+
+            pedidoRepository.save(pedido);
+
+            JOptionPane.showMessageDialog(this, "Pedido agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException | DateTimeParseException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error: Asegúrate de ingresar valores válidos", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException e) {
+            
+            e.printStackTrace();
+        }
     }
+}
+
+private void addProducto() {
+    JTextField nombreProductoField = new JTextField();
+    JTextField descripcionField = new JTextField();
+    JTextField precioField = new JTextField();
+    JTextField stockField = new JTextField();
+
+    Object[] fields = {
+        "Nombre del Producto:", nombreProductoField,
+        "Descripción:", descripcionField,
+        "Precio:", precioField,
+        "Stock:", stockField
+    };
+
+    int result = JOptionPane.showConfirmDialog(this, fields, "Agregar Producto", JOptionPane.OK_CANCEL_OPTION);
+    if (result == JOptionPane.OK_OPTION) {
+        try {
+            Productos producto = new Productos();
+            producto.setNombre_Producto(nombreProductoField.getText());
+            producto.setDescripcion(descripcionField.getText());
+            producto.setPrecio(Double.parseDouble(precioField.getText()));
+            producto.setStock_Disponible(Boolean.parseBoolean(stockField.getText()));
+
+            productoRepository.save(producto);
+
+            JOptionPane.showMessageDialog(this, "Producto agregado correctamente", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al agregar el producto: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error al convertir el precio a número: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+}
+
 
     private void updatePedido() {
         // Implement updatePedido functionality
