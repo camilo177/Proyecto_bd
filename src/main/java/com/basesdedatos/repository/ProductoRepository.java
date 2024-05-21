@@ -86,11 +86,11 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     private Productos createProducto(ResultSet resultSet) throws SQLException {
         Productos producto = new Productos();
-        producto.setProductos_ID(resultSet.getInt("producto_ID"));
-        producto.setNombre_Producto(resultSet.getString("nombreProducto"));
-        producto.setDescripcion(resultSet.getString("descripcion"));
-        producto.setPrecio(resultSet.getDouble("precio"));
-        producto.setStock_Disponible(resultSet.getBoolean("stock_Disponible"));
+        producto.setProductos_ID(resultSet.getInt("Productos_ID"));
+        producto.setNombre_Producto(resultSet.getString("Nombre_Producto"));
+        producto.setDescripcion(resultSet.getString("Descripcion"));
+        producto.setPrecio(resultSet.getDouble("Precio"));
+        producto.setStock_Disponible(resultSet.getBoolean("Stock_Disponibles"));
         return producto;
     }
 

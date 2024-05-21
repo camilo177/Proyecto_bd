@@ -196,7 +196,6 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     // Helper method to map ResultSet to Clientes object
     private Clientes mapResultSetToClientes(ResultSet resultSet) throws SQLException {
         Clientes cliente = new Clientes();
-        cliente.setClientes_ID(resultSet.getInt("Clientes_ID"));
         cliente.setNombre(resultSet.getString("Nombre"));
         cliente.setApellido(resultSet.getString("Apellido"));
         cliente.setDireccion(resultSet.getString("Direccion"));
