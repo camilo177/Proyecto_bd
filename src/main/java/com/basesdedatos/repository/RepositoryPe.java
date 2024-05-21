@@ -13,5 +13,4 @@ public interface RepositoryPe<T> {
     List<Clientes> listarDetallesClientes() throws SQLException;
     Map<String, Integer> contarPedidosPorCliente() throws SQLException;
     List<String> consultarDetallesPedidos() throws SQLException;
-    List<Productos> mostrarProductosNoPedidos() throws SQLException;
 }

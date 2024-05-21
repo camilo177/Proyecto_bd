@@ -53,17 +53,19 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
 
     @Override
     public void save(Pedidos pedido) throws SQLException {
-        if (pedido.getPedidos_ID()==null) {
-           String sql = "INSERT INTO Pedidos (Producto_ID, Cliente_ID, Fecha_Pedido, Estado, Precio_Total) VALUES (?, ?, ?, ?, ?)";
-           try (Connection connection = getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-               preparedStatement.setTimestamp(1, java.sql.Timestamp.valueOf(pedido.getFechaPedido()));
-               preparedStatement.setBoolean(2, pedido.isEstado());
-               preparedStatement.setDouble(3, pedido.getPrecio_Total());
-               preparedStatement.executeUpdate();
-           }
+        if (pedido.getPedidos_ID() == null) {
+            String sql = "INSERT INTO Pedidos (Cliente_ID, Fecha_Pedido, Estado, Precio_Total) VALUES (?, ?, ?, ?)";
+            try (Connection connection = getConnection();
+                 PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
+                preparedStatement.setInt(1, pedido.getCliente_ID().getClientes_ID());
+                preparedStatement.setTimestamp(2, java.sql.Timestamp.valueOf(pedido.getFechaPedido()));
+                preparedStatement.setBoolean(3, pedido.isEstado());
+                preparedStatement.setDouble(4, pedido.getPrecio_Total());
+                preparedStatement.executeUpdate();
+            }
         }
-    } 
+    }
+
 
     @Override
     public void delete(Integer id) throws SQLException {
@@ -172,26 +174,6 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
         return detallesPedidos;
     }
 
-    @Override
-    public List<Productos> mostrarProductosNoPedidos() throws SQLException {
-        List<Productos> productosNoPedidos = new ArrayList<>();
-        String query = "SELECT * FROM Productos WHERE Productos_ID NOT IN (SELECT DISTINCT Pedido_ID FROM Entregas)";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                Productos producto = new Productos(
-                        resultSet.getInt("Productos_ID"),
-                        resultSet.getString("Nombre_Producto"),
-                        resultSet.getString("Descripcion"),
-                        resultSet.getDouble("Precio"),
-                        resultSet.getInt("Stock_Disponibles") == 1
-                );
-                productosNoPedidos.add(producto);
-            }
-        }
-        return productosNoPedidos;
-    } ///PENDIENTE
 
     // Helper method to map ResultSet to Clientes object
     private Clientes mapResultSetToClientes(ResultSet resultSet) throws SQLException {
@@ -207,8 +189,6 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     private Pedidos mapResultSetToPedidos(ResultSet resultSet) throws SQLException {
         Pedidos pedido = new Pedidos();
         pedido.setPedidos_ID(resultSet.getInt("Pedidos_ID"));
-        pedido.setProducto_ID(getProductosById(resultSet.getInt("Producto_ID")));
-        pedido.setCliente_ID(getClientesById(resultSet.getInt("Cliente_ID")));
         pedido.setFechaPedido(resultSet.getTimestamp("Fecha_Pedido").toLocalDateTime());
         pedido.setEstado(resultSet.getBoolean("Estado"));
         pedido.setPrecio_Total(resultSet.getDouble("Precio_Total"));

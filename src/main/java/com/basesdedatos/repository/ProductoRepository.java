@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.basesdedatos.config.DatabaseConnection;
-import com.basesdedatos.model.Clientes;
 import com.basesdedatos.model.Productos;
-import com.basesdedatos.model.Pedidos;
 
 public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 

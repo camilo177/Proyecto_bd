@@ -31,19 +31,10 @@ public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clie
         return clientes;
     }
 
-    private Clientes createCliente(ResultSet myResult) throws SQLException {
-        Clientes cliente = new Clientes();
-        cliente.setClientes_ID(myResult.getInt("Clientes_ID"));
-        cliente.setNombre(myResult.getString("Nombre"));
-        cliente.setApellido(myResult.getString("Apellido"));
-        cliente.setDireccion(myResult.getString("Direccion"));
-        cliente.setContacto(myResult.getString("Contacto"));
-        return cliente;
-    }
-
     @Override
     public Clientes getById(Integer id) throws SQLException {
-        String sql = "SELECT * FROM clientes WHERE clientes_ID = ?";
+        Clientes clientes = null;
+        String sql = "SELECT * FROM clientes WHERE Clientes_ID = ?";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             statement.setInt(1, id);
             ResultSet resultSet = statement.executeQuery();
@@ -51,43 +42,42 @@ public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clie
                 return createCliente(resultSet);
             }
         }
-        return null;
+        return clientes;
     }
 
     @Override
-    public void delete(Integer id) throws SQLException {
-        String sql = "DELETE FROM clientes WHERE clientes_ID = ?";
+    public void save(Clientes cliente) throws SQLException {
+       String sql;
+       if(cliente.getClientes_ID() != null && cliente.getClientes_ID() > 0){
+            sql = "UPDATE clientes SET Nombre = ?, Apellido = ?, Direccion = ?, Contacto = ? WHERE Clientes_ID = ?";
+         } else {
+            sql = "INSERT INTO clientes (Nombre, Apellido, Direccion, Contacto) VALUES (?, ?, ?, ?)";
+         }
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setString(1, cliente.getNombre());
+            statement.setString(2, cliente.getApellido());
+            statement.setString(3, cliente.getDireccion());
+            statement.setString(4, cliente.getContacto());
+            if(cliente.getClientes_ID() != null && cliente.getClientes_ID() > 0){
+                statement.setInt(5, cliente.getClientes_ID());
+            }
+            statement.executeUpdate();
+        }
+        catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+
+        
+    @Override
+    public void delete(Integer id) throws SQLException {
+        try (PreparedStatement statement = getConnection().prepareStatement("DELETE FROM clientes WHERE Clientes_ID = ?")) {
             statement.setInt(1, id);
             statement.executeUpdate();
         }
     }
 
-    @Override
-    public void save(Clientes cliente) throws SQLException {
-        if (cliente.getClientes_ID() == null) {
-            String sql = "INSERT INTO clientes (nombre, apellido, direccion, contacto) VALUES (?, ?, ?, ?)";
-            try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-                statement.setString(1, cliente.getNombre());
-                statement.setString(2, cliente.getApellido());
-                statement.setString(3, cliente.getDireccion());
-                statement.setString(4, cliente.getContacto());
-                statement.executeUpdate();
-            }
-        } else {
-            // Update an existing record
-            String sql = "UPDATE clientes SET nombre = ?, apellido = ?, direccion = ?, contacto = ? WHERE clientes_ID = ?";
-            try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
-                statement.setString(1, cliente.getNombre());
-                statement.setString(2, cliente.getApellido());
-                statement.setString(3, cliente.getDireccion());
-                statement.setString(4, cliente.getContacto());
-                statement.setInt(5, cliente.getClientes_ID());
-                statement.executeUpdate();
-            }
-        }
-    }
-
+ 
     @Override
     public Integer CountClientes() throws SQLException {
         String sql = "SELECT COUNT(*) AS total FROM clientes";
@@ -99,4 +89,15 @@ public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clie
         }
         return 0; // Return 0 if no rows found
     }
+
+    private Clientes createCliente(ResultSet myResult) throws SQLException {
+        Clientes cliente = new Clientes();
+        cliente.setClientes_ID(myResult.getInt("Clientes_ID"));
+        cliente.setNombre(myResult.getString("Nombre"));
+        cliente.setApellido(myResult.getString("Apellido"));
+        cliente.setDireccion(myResult.getString("Direccion"));
+        cliente.setContacto(myResult.getString("Contacto"));
+        return cliente;
+    }
+
 }
