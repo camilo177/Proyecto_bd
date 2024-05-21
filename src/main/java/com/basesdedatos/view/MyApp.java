@@ -49,9 +49,15 @@ public class MyApp extends JFrame {
         JButton btnConsultarDetallesPedidos = new JButton("Consult Details of Pedidos");
         JButton btnCountClientes = new JButton("Count Clients");
         JButton btnListClientesConPedidos = new JButton("List Clients with Pedidos");
+        JButton btnGetStockProductosDisponibles = new JButton("Get Stock Productos Disponibles");
+        JButton btnListarProductosDescripcionPrecio = new JButton("Listar Productos con Descripción y Precio");
+        JButton btnProductosPrecioSuperior = new JButton("Productos Precio > 50");
 
 
-        JPanel panel = new JPanel();
+
+
+
+        JPanel panel = new JPanel(new GridLayout(0, 3)); // GridLayout de 3 columnas
         panel.add(btnGetClientes);
         panel.add(btnGetPedidos);
         panel.add(btnGetProductos);
@@ -62,6 +68,10 @@ public class MyApp extends JFrame {
         panel.add(btnConsultarDetallesPedidos);
         panel.add(btnCountClientes);
         panel.add(btnListClientesConPedidos);
+        panel.add(btnGetStockProductosDisponibles);
+        panel.add(btnListarProductosDescripcionPrecio);
+        panel.add(btnProductosPrecioSuperior);
+
 
 
 
@@ -80,6 +90,12 @@ public class MyApp extends JFrame {
         btnConsultarDetallesPedidos.addActionListener(e -> consultDetailsOfPedidos());
         btnCountClientes.addActionListener(e -> countClientes());
         btnListClientesConPedidos.addActionListener(e -> listarClientesConPedidos());
+        btnGetStockProductosDisponibles.addActionListener(e -> listarStockProductosDisponibles());
+        btnListarProductosDescripcionPrecio.addActionListener(e -> listarProductosDescripcionPrecio());
+        btnProductosPrecioSuperior.addActionListener(e -> productosPrecioSuperior());
+
+
+
 
         // Set JFrame properties
         setTitle("My App");
@@ -374,6 +390,80 @@ private void addProducto() {
             } catch (SQLException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error listing clients with pedidos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        private void listarStockProductosDisponibles() {
+            try {
+                List<String> stockProductosDisponibles = productoRepository.listarStockProductosDisponibles();
+                // Display the stock of available products in the table
+                displayStockProductosDisponibles(stockProductosDisponibles);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(MyApp.this, "Error fetching stock de productos: " + ex.getMessage());
+            }
+        }
+    
+        private void displayStockProductosDisponibles(List<String> stockProductosDisponibles) {
+            // Clear existing data
+            tableModel.setRowCount(0);
+            tableModel.setColumnCount(0);
+    
+            // Populate table with stock data
+            tableModel.addColumn("Nombre Producto");
+            for (String producto : stockProductosDisponibles) {
+                tableModel.addRow(new Object[]{producto});
+            }
+        }
+
+        private void listarProductosDescripcionPrecio() {
+            try {
+                List<String> productosDescripcionPrecio = productoRepository.listarProductosDescripcionPrecio();
+                displayProductosDescripcionPrecio(productosDescripcionPrecio);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(MyApp.this, "Error fetching products: " + ex.getMessage());
+            }
+        }
+    
+        private void displayProductosDescripcionPrecio(List<String> productosDescripcionPrecio) {
+            // Limpiar datos existentes
+            tableModel.setRowCount(0);
+            tableModel.setColumnCount(0);
+    
+            // Agregar columnas
+            tableModel.addColumn("Nombre Producto");
+            tableModel.addColumn("Descripción");
+            tableModel.addColumn("Precio");
+    
+            // Poblar la tabla con datos de productos
+            for (String producto : productosDescripcionPrecio) {
+                String[] productoData = producto.split(" \\| ");
+                tableModel.addRow(productoData);
+            }
+        }
+
+        private void productosPrecioSuperior() {
+            try {
+                List<String> productosSuperiores = productoRepository.productosPrecioSuperior();
+                displayProductosSuperiores(productosSuperiores);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(MyApp.this, "Error fetching products: " + ex.getMessage());
+            }
+        }
+    
+        private void displayProductosSuperiores(List<String> productosSuperiores) {
+            // Limpiar datos existentes
+            tableModel.setRowCount(0);
+            tableModel.setColumnCount(0);
+    
+            // Agregar columna
+            tableModel.addColumn("Nombre Producto");
+    
+            // Poblar la tabla con datos de productos
+            for (String producto : productosSuperiores) {
+                tableModel.addRow(new Object[]{producto});
             }
         }
     
