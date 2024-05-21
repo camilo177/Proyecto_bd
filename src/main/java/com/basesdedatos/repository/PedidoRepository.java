@@ -24,7 +24,7 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     @Override
     public List<Pedidos> findAll() throws SQLException {
         List<Pedidos> pedidosList = new ArrayList<>();
-        String query = "SELECT * FROM Pedidos";
+        String query = "SELECT * FROM pedidos";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -54,13 +54,14 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     @Override
     public void save(Pedidos pedido) throws SQLException {
         if (pedido.getPedidos_ID() == null) {
-            String sql = "INSERT INTO Pedidos (Cliente_ID, Fecha_Pedido, Estado, Precio_Total) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO Pedidos (Productos_ID, Cliente_ID, Fecha_Pedido, Estado, Precio_Total) VALUES (?, ?, ?, ?, ?)";
             try (Connection connection = getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
                 preparedStatement.setInt(1, pedido.getCliente_ID().getClientes_ID());
                 preparedStatement.setTimestamp(2, java.sql.Timestamp.valueOf(pedido.getFechaPedido()));
                 preparedStatement.setBoolean(3, pedido.isEstado());
                 preparedStatement.setDouble(4, pedido.getPrecio_Total());
+                preparedStatement.setInt(5, pedido.getProducto_ID().getProductos_ID());
                 preparedStatement.executeUpdate();
             }
         }
@@ -83,7 +84,7 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
 
     @Override
     public Integer CountPedidos(Clientes cliente) throws SQLException { 
-        String query = "SELECT COUNT(*) AS NumPedidos FROM Pedidos WHERE Clientes_ID = ?";
+        String query = "SELECT COUNT(*) AS NumPedidos FROM Pedidos WHERE Cliente_ID = ?";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, cliente.getClientes_ID());
@@ -99,7 +100,7 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     @Override
     public List<Clientes> listarDetallesClientes() throws SQLException {
         List<Clientes> detallesClientes = new ArrayList<>();
-        String query = "SELECT * FROM Clientes";
+        String query = "SELECT * FROM clientes WHERE pedidos > 0";
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query);
              ResultSet resultSet = preparedStatement.executeQuery()) {
@@ -112,22 +113,25 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
     }
 
     @Override
-    public Map<String, Integer> contarPedidosPorCliente() throws SQLException {
-        Map<String, Integer> pedidosPorCliente = new HashMap<>();
-        String query = "SELECT c.Nombre, COUNT(p.Pedidos_ID) AS NumPedidos " +
-                       "FROM Clientes c " +
-                       "JOIN Pedidos p ON c.Clientes_ID = p.Cliente_ID " +
-                       "GROUP BY c.Nombre";
-        try (Connection connection = getConnection();
-             PreparedStatement preparedStatement = connection.prepareStatement(query);
-             ResultSet resultSet = preparedStatement.executeQuery()) {
-            while (resultSet.next()) {
-                String clienteNombre = resultSet.getString("Nombre");
-                int numPedidos = resultSet.getInt("NumPedidos");
-                pedidosPorCliente.put(clienteNombre, numPedidos);
+public Map<Clientes, Integer> contarPedidosPorCliente() throws SQLException {
+    Map<Clientes, Integer> pedidosPorCliente = new HashMap<>();
+    String query = "SELECT c.Clientes_ID, c.Nombre, c.Apellido, COUNT(p.Pedidos_ID) AS NumPedidos " +
+                   "FROM Clientes c " +
+                   "JOIN Pedidos p ON c.Clientes_ID = p.Cliente_ID " +
+                   "GROUP BY c.Clientes_ID, c.Nombre, c.Apellido";
+    try (Connection connection = getConnection();
+         PreparedStatement preparedStatement = connection.prepareStatement(query);
+         ResultSet resultSet = preparedStatement.executeQuery()) {
+        while (resultSet.next()) {
+            Clientes cliente = new Clientes();
+            cliente.setClientes_ID(resultSet.getInt("Clientes_ID"));
+            cliente.setNombre(resultSet.getString("Nombre"));
+            cliente.setApellido(resultSet.getString("Apellido"));
+            int numPedidos = resultSet.getInt("NumPedidos");
+            pedidosPorCliente.put(cliente, numPedidos);
             }
         }
-        return pedidosPorCliente;
+    return pedidosPorCliente;
     }
 
     @Override
@@ -228,5 +232,27 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
         }
         return null;
     }
+
+    @Override
+    public List<String> ListarClientesconPedidos() throws SQLException {
+        List<String> clientesConPedidos = new ArrayList<>();
+        String query = "SELECT DISTINCT c.Clientes_ID, c.Nombre, c.Apellido, c.Direccion, c.Contacto " +
+                    "FROM clientes c " +
+                    "JOIN pedidos p ON c.Clientes_ID = p.Cliente_ID";
+        try (Connection connection = getConnection();
+            PreparedStatement preparedStatement = connection.prepareStatement(query);
+            ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                String clienteInfo = resultSet.getInt("Clientes_ID") + " | " +
+                                    resultSet.getString("Nombre") + " " +
+                                    resultSet.getString("Apellido") + " | " +
+                                    resultSet.getString("Direccion") + " | " +
+                                    resultSet.getString("Contacto");
+                clientesConPedidos.add(clienteInfo);
+            }
+        }
+        return clientesConPedidos;
+    }
+
 }
 

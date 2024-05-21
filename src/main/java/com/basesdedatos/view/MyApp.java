@@ -43,17 +43,27 @@ public class MyApp extends JFrame {
         JButton btnGetProductos = new JButton("Get All Productos");
         JButton btnAddPedido = new JButton("Add Pedido");
         JButton btnAddProducto = new JButton("Add Producto");
-        JButton btnUpdatePedido = new JButton("Update Pedido");
-        JButton btnDeletePedido = new JButton("Delete Pedido");
+        JButton btnCountPedidosButton = new JButton("Count Pedidos");
+        JButton btnListClientDetails = new JButton("List Client Details");
+        JButton btnCountPedidosPorCliente = new JButton("Count Pedidos by Clientes");
+        JButton btnConsultarDetallesPedidos = new JButton("Consult Details of Pedidos");
+        JButton btnCountClientes = new JButton("Count Clients");
+        JButton btnListClientesConPedidos = new JButton("List Clients with Pedidos");
+
 
         JPanel panel = new JPanel();
         panel.add(btnGetClientes);
         panel.add(btnGetPedidos);
         panel.add(btnGetProductos);
-        panel.add(btnAddPedido);
         panel.add(btnAddProducto);
-        panel.add(btnUpdatePedido);
-        panel.add(btnDeletePedido);
+        panel.add(btnCountPedidosButton);
+        panel.add(btnListClientDetails);
+        panel.add(btnCountPedidosPorCliente);
+        panel.add(btnConsultarDetallesPedidos);
+        panel.add(btnCountClientes);
+        panel.add(btnListClientesConPedidos);
+
+
 
         add(panel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
@@ -64,8 +74,12 @@ public class MyApp extends JFrame {
         btnGetProductos.addActionListener(e -> fetchData(() -> productoRepository.findAll()));
         btnAddPedido.addActionListener(e -> addPedido());
         btnAddProducto.addActionListener(e -> addProducto());
-        btnUpdatePedido.addActionListener(e -> updatePedido());
-        btnDeletePedido.addActionListener(e -> deletePedido());
+        btnCountPedidosButton.addActionListener(e -> countPedidos());
+        btnListClientDetails.addActionListener(e -> listClientDetails());
+        btnCountPedidosPorCliente.addActionListener(e -> countPedidosByClientes());
+        btnConsultarDetallesPedidos.addActionListener(e -> consultDetailsOfPedidos());
+        btnCountClientes.addActionListener(e -> countClientes());
+        btnListClientesConPedidos.addActionListener(e -> listarClientesConPedidos());
 
         // Set JFrame properties
         setTitle("My App");
@@ -221,19 +235,148 @@ private void addProducto() {
 }
 
 
+       private void countPedidos() {
+        try {
+            // Create a dialog to get the Cliente ID
+            String clienteIdStr = JOptionPane.showInputDialog(this, "Enter Cliente ID:");
+            if (clienteIdStr != null) {
+                int clienteId = Integer.parseInt(clienteIdStr);
+                // Fetch the count of Pedidos for the specified Cliente
+                int count = pedidoRepository.CountPedidos(new Clientes(clienteId));
+                // Display the count in a dialog box
+                JOptionPane.showMessageDialog(this, "Number of Pedidos for Cliente ID " + clienteId + ": " + count);
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Invalid Cliente ID format", "Error", JOptionPane.ERROR_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error counting pedidos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void listClientDetails() {
+        try {
+            // Fetch the details of all clients
+            List<Clientes> clientDetails = clienteRepository.findAll();
+            // Display the client details in the table
+            displayDataInTable(clientDetails);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error listing client details: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private void countPedidosByClientes() {
+        try {
+            // Fetch the count of Pedidos for each client
+            Map<Clientes, Integer> pedidosCountMap = pedidoRepository.contarPedidosPorCliente();
+            // Clear the table and set column headers
+            tableModel.setRowCount(0);
+            tableModel.setColumnCount(0);
+            tableModel.addColumn("Cliente_ID");
+            tableModel.addColumn("Nombre");
+            tableModel.addColumn("Apellido");
+            tableModel.addColumn("Pedidos Count");
+    
+            // Populate the table with client details and their respective Pedidos counts
+            for (Map.Entry<Clientes, Integer> entry : pedidosCountMap.entrySet()) {
+                Clientes cliente = entry.getKey();
+                Integer count = entry.getValue();
+                tableModel.addRow(new Object[]{
+                        cliente.getClientes_ID(),
+                        cliente.getNombre(),
+                        cliente.getApellido(),
+                        count
+                });
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error counting pedidos by clientes: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+        
+
+    private void consultDetailsOfPedidos() {
+        try {
+            // Fetch the details of all Pedidos
+            List<String> detallesPedidosList = pedidoRepository.consultarDetallesPedidos();
+            
+            // Clear the table and set column headers
+            tableModel.setRowCount(0);
+            tableModel.setColumnCount(0);
+            tableModel.addColumn("Pedidos_ID");
+            tableModel.addColumn("Nombre_Cliente");
+            tableModel.addColumn("Apellido_Cliente");
+            tableModel.addColumn("Direccion_Cliente");
+            tableModel.addColumn("Contacto_Cliente");
+            tableModel.addColumn("Fecha_Pedido");
+            tableModel.addColumn("Estado_Pedido");
+            tableModel.addColumn("Metodo_Pago");
+            tableModel.addColumn("Precio_Total");
+            tableModel.addColumn("Fecha_Entrega");
+            tableModel.addColumn("Estado_Entrega");
+            tableModel.addColumn("Direccion_Entrega");
+    
+            // Populate the table with the details of Pedidos
+            for (String detallesPedido : detallesPedidosList) {
+                String[] detallesArray = detallesPedido.split(" \\| ");
+                tableModel.addRow(detallesArray);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error consulting pedido details: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // Placeholder methods for future implementation
     private void updatePedido() {
         // Implement updatePedido functionality
         // You can create a dialog for user input and then call the repository method to update the pedido
     }
 
-    private void deletePedido() {
-        // Implement deletePedido functionality
-        // You can prompt the user for confirmation and then call the repository method to delete the pedido
+    // Method to count clients
+    private void countClientes() {
+        try {
+            int totalClientes = clienteRepository.CountClientes();
+            JOptionPane.showMessageDialog(this, "Total Clients: " + totalClientes, "Client Count", JOptionPane.INFORMATION_MESSAGE);
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "Error counting clients: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     interface DataFetcher {
         List<?> fetch() throws SQLException;
     }
+
+        // Method to list clients with pedidos
+        private void listarClientesConPedidos() {
+            try {
+                List<String> clientes = pedidoRepository.ListarClientesconPedidos();
+                if (clientes.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "No clients with pedidos found", "Information", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    // Clear the table and set column headers
+                    tableModel.setRowCount(0);
+                    tableModel.setColumnCount(0);
+                    tableModel.addColumn("Clientes_ID");
+                    tableModel.addColumn("Nombre");
+                    tableModel.addColumn("Apellido");
+                    tableModel.addColumn("Direccion");
+                    tableModel.addColumn("Contacto");
+    
+                    // Populate the table with client details
+                    for (String cliente : clientes) {
+                        String[] clienteData = cliente.split(" \\| ");
+                        tableModel.addRow(clienteData);
+                    }
+                }
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error listing clients with pedidos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MyApp::new);

@@ -10,6 +10,10 @@ public class Clientes {
     public Clientes(){   
     }
 
+    public Clientes(Integer Clientes_ID) {
+        this.Clientes_ID = Clientes_ID;
+    }
+
     public Clientes(Integer Clientes_ID, String Apellido, String Nombre, String Direccion, String Contacto) {
         this.Clientes_ID = Clientes_ID;
         this.Apellido = Apellido;

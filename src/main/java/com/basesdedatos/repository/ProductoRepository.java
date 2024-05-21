@@ -35,7 +35,7 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     @Override
     public Productos getById(Integer id) throws SQLException {
-        String sql = "SELECT * FROM productos WHERE producto_ID = ?";
+        String sql = "SELECT * FROM productos WHERE Productos_ID = ?";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             statement.setInt(1, id);
             try (ResultSet resultSet = statement.executeQuery()) {
@@ -49,9 +49,9 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     @Override
     public void save(Productos producto) throws SQLException {
-        if (producto.getProductos_ID() == 0) {
+        if (producto.getProductos_ID() == null) {
             // Insert a new record
-            String sql = "INSERT INTO productos (nombreProducto, descripcion, precio, stock_Disponible) VALUES (?, ?, ?, ?)";
+            String sql = "INSERT INTO productos (Nombre_Producto, Descripcion, Precio, Stock_Disponibles) VALUES (?, ?, ?, ?)";
             try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
                 statement.setString(1, producto.getNombre_Producto());
                 statement.setString(2, producto.getDescripcion());
@@ -61,7 +61,7 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
             }
         } else {
             // Update an existing record
-            String sql = "UPDATE productos SET nombreProducto = ?, descripcion = ?, precio = ?, stock_Disponible = ? WHERE producto_ID = ?";
+            String sql = "UPDATE productos SET Nombre_Producto = ?, Descripcion = ?, Precio = ?, Stock_Disponibles = ? WHERE Productos_ID = ?";
             try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
                 statement.setString(1, producto.getNombre_Producto());
                 statement.setString(2, producto.getDescripcion());
@@ -75,7 +75,7 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
 
     @Override
     public void delete(Integer id) throws SQLException {
-        String sql = "DELETE FROM productos WHERE producto_ID = ?";
+        String sql = "DELETE FROM productos WHERE Productos_ID = ?";
         try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
             statement.setInt(1, id);
             statement.executeUpdate();
@@ -95,11 +95,11 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
     @Override
     public List<String> listarStockProductosDisponibles() throws SQLException {
         List<String> stockDisponible = new ArrayList<>();
-        String sql = "SELECT nombreProducto FROM productos WHERE stock_Disponible = true";
+        String sql = "SELECT Nombre_Producto FROM productos WHERE Stock_Disponibles = true";
         try (PreparedStatement statement = getConnection().prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                stockDisponible.add(resultSet.getString("nombreProducto"));
+                stockDisponible.add(resultSet.getString("Nombre_Producto"));
             }
         }
         return stockDisponible;
@@ -108,11 +108,11 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
     @Override
     public List<String> productosPrecioSuperior() throws SQLException {
         List<String> productosSuperiores = new ArrayList<>();
-        String sql = "SELECT nombreProducto FROM productos WHERE precio > 50";
+        String sql = "SELECT Nombre_Producto FROM productos WHERE Precio > 50";
         try (PreparedStatement statement = getConnection().prepareStatement(sql);
              ResultSet resultSet = statement.executeQuery()) {
             while (resultSet.next()) {
-                productosSuperiores.add(resultSet.getString("nombreProducto"));
+                productosSuperiores.add(resultSet.getString("Nombre_Producto"));
             }
         }
         return productosSuperiores;
