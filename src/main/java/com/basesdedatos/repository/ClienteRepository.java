@@ -33,11 +33,11 @@ public class ClienteRepository implements Repository<Clientes>, RepositoryC<Clie
 
     private Clientes createCliente(ResultSet myResult) throws SQLException {
         Clientes cliente = new Clientes();
-        cliente.setClientes_ID(myResult.getInt("clientes_ID"));
-        cliente.setNombre(myResult.getString("nombre"));
-        cliente.setApellido(myResult.getString("apellido"));
-        cliente.setDireccion(myResult.getString("direccion"));
-        cliente.setContacto(myResult.getString("contacto"));
+        cliente.setClientes_ID(myResult.getInt("Clientes_ID"));
+        cliente.setNombre(myResult.getString("Nombre"));
+        cliente.setApellido(myResult.getString("Apellido"));
+        cliente.setDireccion(myResult.getString("Direccion"));
+        cliente.setContacto(myResult.getString("Contacto"));
         return cliente;
     }
 
