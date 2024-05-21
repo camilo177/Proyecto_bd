@@ -88,11 +88,11 @@ public class PedidoRepository implements Repository<Pedidos>, RepositoryPe<Pedid
         try (Connection connection = getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(query)) {
             preparedStatement.setInt(1, cliente.getClientes_ID());
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+             ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
                     return resultSet.getInt("NumPedidos");
                 }
-            }
+            
         }
         return 0;
     }
@@ -240,8 +240,8 @@ public Map<Clientes, Integer> contarPedidosPorCliente() throws SQLException {
                     "FROM clientes c " +
                     "JOIN pedidos p ON c.Clientes_ID = p.Cliente_ID";
         try (Connection connection = getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(query);
-            ResultSet resultSet = preparedStatement.executeQuery()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(query)){
+            ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 String clienteInfo = resultSet.getInt("Clientes_ID") + " | " +
                                     resultSet.getString("Nombre") + " " +
