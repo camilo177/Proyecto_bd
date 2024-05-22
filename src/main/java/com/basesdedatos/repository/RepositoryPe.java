@@ -14,4 +14,6 @@ public interface RepositoryPe<T> {
     Map<Clientes, Integer> contarPedidosPorCliente() throws SQLException;
     List<String> consultarDetallesPedidos() throws SQLException;
     List<String> ListarClientesconPedidos() throws SQLException;
+    Double sumarTotalPedidos() throws SQLException;  // Nuevo método
+
 }

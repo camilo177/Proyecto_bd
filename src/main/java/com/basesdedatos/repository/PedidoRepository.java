@@ -254,5 +254,18 @@ public Map<Clientes, Integer> contarPedidosPorCliente() throws SQLException {
         return clientesConPedidos;
     }
 
+    @Override
+    public Double sumarTotalPedidos() throws SQLException {
+        String query = "SELECT SUM(Precio_Total) AS TotalSuma FROM Pedidos";
+        try (Connection connection = getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(query);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            if (resultSet.next()) {
+                return resultSet.getDouble("TotalSuma");
+            }
+        }
+        return 0.0;
+    }
+
 }
 

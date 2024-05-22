@@ -52,6 +52,8 @@ public class MyApp extends JFrame {
         JButton btnGetStockProductosDisponibles = new JButton("Get Stock available Productos");
         JButton btnListarProductosDescripcionPrecio = new JButton("List Productos with Descripción and Precio");
         JButton btnProductosPrecioSuperior = new JButton("Productos price > input");
+        JButton btnSumarTotalPedidos = new JButton("Sumar Total de Pedidos");
+
 
 
 
@@ -71,6 +73,7 @@ public class MyApp extends JFrame {
         panel.add(btnGetStockProductosDisponibles);
         panel.add(btnListarProductosDescripcionPrecio);
         panel.add(btnProductosPrecioSuperior);
+        panel.add(btnSumarTotalPedidos);
 
 
 
@@ -93,6 +96,8 @@ public class MyApp extends JFrame {
         btnGetStockProductosDisponibles.addActionListener(e -> listarStockProductosDisponibles());
         btnListarProductosDescripcionPrecio.addActionListener(e -> listarProductosDescripcionPrecio());
         btnProductosPrecioSuperior.addActionListener(e -> productosPrecioSuperior());
+        btnSumarTotalPedidos.addActionListener(e -> sumarTotalPedidos());
+
 
 
 
@@ -470,6 +475,18 @@ private void addProducto() {
             // Poblar la tabla con datos de productos
             for (String producto : productosSuperiores) {
                 tableModel.addRow(new Object[]{producto});
+            }
+        }
+        
+        private void sumarTotalPedidos() {
+            try {
+                // Obtener la suma total de los pedidos
+                double totalPedidos = pedidoRepository.sumarTotalPedidos();
+                // Mostrar la suma total en un cuadro de diálogo
+                JOptionPane.showMessageDialog(this, "La suma total de los pedidos es: " + totalPedidos, "Suma Total de Pedidos", JOptionPane.INFORMATION_MESSAGE);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+                JOptionPane.showMessageDialog(this, "Error al obtener la suma total de los pedidos: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             }
         }
         
