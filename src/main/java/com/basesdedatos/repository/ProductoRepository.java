@@ -106,17 +106,20 @@ public class ProductoRepository implements Repository<Productos>, RepositoryPr {
     }
 
     @Override
-    public List<String> productosPrecioSuperior() throws SQLException {
+    public List<String> productosPrecioSuperior(double precio) throws SQLException {
         List<String> productosSuperiores = new ArrayList<>();
-        String sql = "SELECT Nombre_Producto FROM productos WHERE Precio > 50";
-        try (PreparedStatement statement = getConnection().prepareStatement(sql);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                productosSuperiores.add(resultSet.getString("Nombre_Producto"));
+        String sql = "SELECT Nombre_Producto FROM productos WHERE Precio > ?";
+        try (PreparedStatement statement = getConnection().prepareStatement(sql)) {
+            statement.setDouble(1, precio);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    productosSuperiores.add(resultSet.getString("Nombre_Producto"));
+                }
             }
         }
         return productosSuperiores;
     }
+    
 
     @Override
     public List<String> listarProductosDescripcionPrecio() throws SQLException {

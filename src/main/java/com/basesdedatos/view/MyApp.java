@@ -49,9 +49,9 @@ public class MyApp extends JFrame {
         JButton btnConsultarDetallesPedidos = new JButton("Consult Details of Pedidos");
         JButton btnCountClientes = new JButton("Count Clients");
         JButton btnListClientesConPedidos = new JButton("List Clients with Pedidos");
-        JButton btnGetStockProductosDisponibles = new JButton("Get Stock Productos Disponibles");
-        JButton btnListarProductosDescripcionPrecio = new JButton("Listar Productos con Descripción y Precio");
-        JButton btnProductosPrecioSuperior = new JButton("Productos Precio > 50");
+        JButton btnGetStockProductosDisponibles = new JButton("Get Stock available Productos");
+        JButton btnListarProductosDescripcionPrecio = new JButton("List Productos with Descripción and Precio");
+        JButton btnProductosPrecioSuperior = new JButton("Productos price > input");
 
 
 
@@ -444,28 +444,35 @@ private void addProducto() {
         }
 
         private void productosPrecioSuperior() {
-            try {
-                List<String> productosSuperiores = productoRepository.productosPrecioSuperior();
-                displayProductosSuperiores(productosSuperiores);
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-                JOptionPane.showMessageDialog(MyApp.this, "Error fetching products: " + ex.getMessage());
+            String precioStr = JOptionPane.showInputDialog(this, "Ingrese el valor de precio mínimo:");
+            if (precioStr != null) {
+                try {
+                    double precio = Double.parseDouble(precioStr);
+                    List<String> productosSuperiores = productoRepository.productosPrecioSuperior(precio);
+                    displayProductosSuperiores(productosSuperiores);
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "Ingrese un valor numérico válido", "Error", JOptionPane.ERROR_MESSAGE);
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                    JOptionPane.showMessageDialog(this, "Error fetching products: " + ex.getMessage());
+                }
             }
         }
-    
+        
         private void displayProductosSuperiores(List<String> productosSuperiores) {
             // Limpiar datos existentes
             tableModel.setRowCount(0);
             tableModel.setColumnCount(0);
-    
+        
             // Agregar columna
             tableModel.addColumn("Nombre Producto");
-    
+        
             // Poblar la tabla con datos de productos
             for (String producto : productosSuperiores) {
                 tableModel.addRow(new Object[]{producto});
             }
         }
+        
     
 
     public static void main(String[] args) {
